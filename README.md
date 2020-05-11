@@ -1,104 +1,46 @@
-![Standard Notes Extension Repository](../assets/standardnotes.png?raw=true)
+# snextensions
 
-## Standard Notes Extensions - Self-Hosted Repository
-Host Standard Notes extensions on your own server. This utility parses most of the open-source extensions available from original repository as well as from other authors and builds an extensions repository which then can be plugged directly into Standard Notes Web/Desktop Clients. (https://standardnotes.org/)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/53e5f0b7-02c9-400d-8590-159860892cdc/deploy-status)](https://app.netlify.com/sites/snext/deploys)
 
-Extensions are listed as YAML in the `\extensions` sub-directory, pull a request if you'd like to add yours.
+A set of open source extensions for StandardNotes.
 
-### Requirements
-* Python 3
-	* pyyaml module
-	* requests module
+# Usage
 
-### Demo
-<p align="center">
-	<img alt="Standard Notes Extension Repository Demo" src="https://github.com/iganeshk/standardnotes-extensions/raw/assets/standardnotes_demo.gif" width="80%" />
-</p>
+Paste `https://snext.netlify.com/index.json` into `Extended Code` in StandardNotes.
 
-### Usage
+# Notice
 
-* Clone this repository to the web-server:
+Currently we only host extensions developed by StandardNotes.
+Some of the official extensions are not included.
 
-```bash
-$ git clone https://github.com/iganeshk/standardnotes-extensions.git
-$ cd standardnotes-extensions
-$ pip3 install -r requirements.txt
-```
+# Contribution
 
-* Use the env.sample to create a .env file for your environment variables. The utility will automatically load these when it starts.
+If you'd like an extension to be included in this repository, feel free to open an issue.
 
-```
-# Sample ENV setup Variables (YAML)
-# Copy this file and update as needed.
-#
-#   $ cp env.sample .env
-#
-# Do not include this new file in source control
-# Github Credentials
-# Generate your token here: https://github.com/settings/tokens
-# No additional permission required, this is just to avoid github api rate limits
-#
+# Self-hosting
 
-domain: https://your-domain.com/extensions
+## With Netlify
 
-github:
-  username: USERNAME
-  token: TOKEN
+In case if you'd like to host your own site other than using ours, you can do so with Netlify:
 
-```
+- Fork this repository;
+- Create a Netlify account if you don't have one already;
+- In Netlify app, Use "New site from Git" to create a site from your forked GitHub repository;
+- Wait for the build to finish;
+- After that you can use `YOUR_SITE_URL/index.json` as an `Extended Code`;
+- Optionally you can set a human-readable site name (a subdomain of `netlify.com`) from the `Site settings` page.
 
-* [Optional] Make additions or appropriate changes in `/extensions` directory.
-* Run the utility:
+## Without Netlify
 
-```bash
-$ python3 build_repo.py
-```
-* Serve the `/public` directory and verify if the endpoint is reachable.
+It's easy and recommended to host with Netlify. However if you insist not to use it, it is also possible:
 
-```
-https://your-domain.com/extensions/index.json
-```
-* Import the above endpoint into the web/desktop client. (Note: Enable CORS for your web server respectively, nginx setup provided below)
-
-### Setup with nginx
-
-```nginx
-	location ^~ /extensions {
-		autoindex off;
-		alias /path/to/standardnotes-extensions/public;
-		# CORS HEADERS
-		if ($request_method = 'OPTIONS') {
-		   add_header 'Access-Control-Allow-Origin' '*';
-		   add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
-		   #
-		   # Custom headers and headers various browsers *should* be OK with but aren't
-		   #
-		   add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range';
-		   #
-		   # Tell client that this pre-flight info is valid for 20 days
-		   #
-		   add_header 'Access-Control-Max-Age' 1728000;
-		   add_header 'Content-Type' 'text/plain; charset=utf-8';
-		   add_header 'Content-Length' 0;
-		   return 204;
-		}
-		if ($request_method = 'POST') {
-		   add_header 'Access-Control-Allow-Origin' '*';
-		   add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
-		   add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range';
-		   add_header 'Access-Control-Expose-Headers' 'Content-Length,Content-Range';
-		}
-		if ($request_method = 'GET') {
-		   add_header 'Access-Control-Allow-Origin' '*';
-		   add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
-		   add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range';
-		   add_header 'Access-Control-Expose-Headers' 'Content-Length,Content-Range';
-		}
-	}
-```
-
-### Acknowledgments
-* This project was adapted originally from https://github.com/JokerQyou/snextensions
-* Check out https://github.com/jonhadfield/awesome-standard-notes for more Standard Notes stuff!
-* Authors of custom themes and extensions
-
+- Prepare your environment with `Python 3.7` with `pip`, as well as `Git`;
+- Make sure Python 3.7 can be called directly via `python` from the shell;
+- Make sure Git is installed and can be called directly via `git` from the shell;
+- `pip install -r requirements.txt` to install required Python libraries;
+- Run the build script `./build.sh`;
+- Verify that:
+  - the `public` directory is generated;
+  - there should be `public/index.json` containing information of all extensions;
+  - all extensions should exists in `public` as sub-directories;
+- Host the `public` directory like you would do with any static resources, using nginx, caddy, etc.
